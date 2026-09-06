@@ -10,6 +10,8 @@ const blogSchema = new mongoose.Schema({
   excerpt: { type: String, required: true, trim: true, maxlength: 500 },
   content: { type: String, required: true, trim: true, maxlength: 100000 },
   coverImage: { type: String, trim: true, maxlength: 2048, validate: { validator: value => !value || /^https?:\/\//i.test(value), message: 'coverImage must be an http(s) URL.' } },
+  githubUrl: { type: String, trim: true, maxlength: 2048, validate: { validator: value => !value || /^https?:\/\//i.test(value), message: 'githubUrl must be an http(s) URL.' } },
+  deployedUrl: { type: String, trim: true, maxlength: 2048, validate: { validator: value => !value || /^https?:\/\//i.test(value), message: 'deployedUrl must be an http(s) URL.' } },
   tags: { type: [String], default: [], validate: [tags => tags.length <= 12, 'A blog may have at most 12 tags.'] },
   readingTime: { type: String, trim: true, maxlength: 30 },
   published: { type: Boolean, default: false },

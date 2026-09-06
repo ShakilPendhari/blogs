@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Article">
+    <title>Article | Portfolio</title>
+    <link rel="stylesheet" href="/blogs.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner"><a class="brand" href="/blogs.html">Writing<span>.</span></a>
+            <nav aria-label="Primary navigation"><a href="/blogs.html">All articles</a><a href="/admin.html">Admin</a>
+            </nav>
+        </div>
+    </header>
+    <main id="reading-page" class="reading-page">
+        <div class="container reading-container">
+            <a class="back-link" href="/blogs.html">&larr; Back to all articles</a>
+            <div id="article-loading" class="loading">Loading article...</div>
+            <article id="article" class="reading-article hidden"></article>
+            <section id="article-error" class="empty-state hidden">
+                <h1>Article not found</h1>
+                <p>This article may have been unpublished or moved.</p><a class="text-link" href="/blogs.html">Browse
+                    all articles &rarr;</a>
+            </section>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <div class="container"><span>Writing archive</span><span>Built with curiosity.</span></div>
+    </footer>
+    <script src="/blog.js"></script>
+</body>
+
+</html>

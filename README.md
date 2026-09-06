@@ -13,6 +13,8 @@ npm run dev
 
 The local API is available at `http://localhost:5000/api`. Seed example articles with `npm run seed` if needed.
 
+The public article index is available at `http://localhost:5000/`. Individual articles use clean URLs such as `http://localhost:5000/my-article-slug`. The index keeps search, topic filters, and pagination in the URL so filtered views can be shared.
+
 ## Environment variables
 
 The server `.env` only needs these values:
@@ -49,7 +51,7 @@ The portfolio frontend must use the API base URL ending in `/api`, for example `
 ## API contract
 
 - `GET /api/health` returns API health.
-- `GET /api/blogs` returns published blogs, newest first. Add `?category=Frontend` to filter by category.
+- `GET /api/blogs` returns paginated published blogs, newest first. Use `?page=1&limit=10&search=hooks&category=Frontend` to filter and paginate.
 - `GET /api/blogs/categories` returns available categories.
 - `GET /api/blogs/:slug` returns one published blog.
 - `POST /api/auth/login` accepts `{ "password": "..." }` and returns an admin JWT.
@@ -57,4 +59,4 @@ The portfolio frontend must use the API base URL ending in `/api`, for example `
 - `GET /api/blogs/admin/all` requires admin authentication.
 - `POST /api/blogs`, `PUT /api/blogs/:id`, and `DELETE /api/blogs/:id` require `Authorization: Bearer <token>`.
 
-Blog creation requires `title`, `excerpt`, and `content`. Optional fields are `slug`, `coverImage`, `readingTime`, `category`, `tags`, `published`, and `publishedAt`. `content` is Markdown.
+Blog creation requires `title`, `excerpt`, and `content`. Optional fields are `slug`, `coverImage`, `githubUrl`, `deployedUrl`, `readingTime`, `category`, `tags`, `published`, and `publishedAt`. `content` is Markdown. Admin listing supports `page`, `limit`, `search`, `category`, and `published` filters.

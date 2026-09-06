@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Practical articles about frontend, backend, JavaScript, databases, and DevOps.">
+    <title>Writing | Portfolio</title>
+    <link rel="stylesheet" href="/blogs.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="/blogs.html">Writing<span>.</span></a>
+            <nav aria-label="Primary navigation"><a href="/blogs.html" aria-current="page">Articles</a><a
+                    href="/admin.html">Admin</a></nav>
+        </div>
+    </header>
+    <main>
+        <section class="listing-hero">
+            <div class="container">
+                <p class="kicker">Notes from the build</p>
+                <h1>Ideas, lessons, and<br><em>things worth keeping.</em></h1>
+                <p class="hero-copy">Long-form notes on building useful software, understanding systems, and getting the
+                    details right.</p>
+            </div>
+        </section>
+        <section class="container library" aria-labelledby="library-title">
+            <div class="section-heading">
+                <div>
+                    <p class="kicker">The library</p>
+                    <h2 id="library-title">Latest articles</h2>
+                </div>
+                <p id="result-count" class="result-count"></p>
+            </div>
+            <form id="filters" class="filter-bar" role="search">
+                <label class="search-field"><span class="sr-only">Search articles</span><input id="search" type="search"
+                        placeholder="Search articles..." autocomplete="off"><span class="search-icon"
+                        aria-hidden="true">⌕</span></label>
+                <label><span class="sr-only">Filter by category</span><select id="category">
+                        <option value="">All topics</option>
+                    </select></label>
+                <button class="clear-filter" id="clear-filters" type="button">Clear filters</button>
+            </form>
+            <div id="article-list" class="article-grid" aria-live="polite"></div>
+            <div id="empty-state" class="empty-state hidden">
+                <h2>No articles found</h2>
+                <p>Try a different search or topic.</p>
+            </div>
+            <nav id="pagination" class="pagination" aria-label="Article pages"></nav>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <div class="container"><span>Writing archive</span><span>Built with curiosity.</span></div>
+    </footer>
+    <script src="/blogs.js"></script>
+</body>
+
+</html>
