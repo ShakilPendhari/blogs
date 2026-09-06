@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blog Admin</title>
+    <link rel="stylesheet" href="/admin.css">
+</head>
+
+<body>
+    <main class="shell">
+        <header class="header">
+            <div>
+                <p class="eyebrow">Portfolio CMS</p>
+                <h1>Blog admin</h1>
+            </div>
+            <button id="logout" class="button secondary hidden" type="button">Log out</button>
+        </header>
+        <section id="login-panel" class="panel narrow">
+            <h2>Sign in</h2>
+            <p>Use your admin password to manage articles.</p>
+            <form id="login-form"><label>Password<input id="password" type="password" required
+                        autocomplete="current-password"></label><button class="button" type="submit">Sign in</button>
+            </form>
+        </section>
+        <section id="admin-panel" class="hidden">
+            <div class="layout">
+                <form id="blog-form" class="panel">
+                    <div class="form-heading">
+                        <div>
+                            <p class="eyebrow">Editor</p>
+                            <h2 id="form-title">New article</h2>
+                        </div><button id="cancel-edit" class="button secondary hidden" type="button">Cancel</button>
+                    </div>
+                    <input id="blog-id" type="hidden">
+                    <label>Title<input id="title" required maxlength="180"></label>
+                    <label>Category<select id="category"></select></label>
+                    <label>Excerpt<textarea id="excerpt" required maxlength="500" rows="3"></textarea></label>
+                    <label>Content <span class="hint">Markdown supported</span><textarea id="content" required
+                            rows="12"></textarea></label>
+                    <label>Tags <span class="hint">comma separated</span><input id="tags"></label>
+                    <label>Cover image URL<input id="coverImage" type="url" placeholder="https://..."></label>
+                    <label class="check"><input id="published" type="checkbox" checked> Published</label>
+                    <button class="button" type="submit">Save article</button>
+                    <p id="form-message" class="message"></p>
+                </form>
+                <section class="panel">
+                    <div class="form-heading">
+                        <div>
+                            <p class="eyebrow">Library</p>
+                            <h2>Articles</h2>
+                        </div><button id="refresh" class="button secondary" type="button">Refresh</button>
+                    </div>
+                    <div id="articles" class="articles"></div>
+                </section>
+            </div>
+        </section>
+        <p id="notice" class="notice"></p>
+    </main>
+    <script src="/admin.js"></script>
+</body>
+
+</html>
