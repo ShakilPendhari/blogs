@@ -2,14 +2,14 @@ const express = require('express');
 require('node:dns/promises').setServers(["1.1.1.1", "8.8.8.8"]);
 const path = require('node:path');
 const cors = require('cors');
-const { clientUrl, adminPasswordHash, adminJwtSecret } = require('./config');
+const { clientUrls, adminPasswordHash, adminJwtSecret } = require('./config');
 const { createSession, destroySession, verifyPassword } = require('./middleware/authSession');
 const blogRoutes = require('./routes/blogs');
 const errorHandler = require('./middleware/errorHandler');
 const app = express();
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-app.use(cors({ origin: clientUrl, methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(cors({ origin: (origin, callback) => callback(null, !origin || clientUrls.includes(origin)), methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization'] }));
 app.use(express.json({ limit: '1mb' }));
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.post('/api/auth/login', (req, res) => {
