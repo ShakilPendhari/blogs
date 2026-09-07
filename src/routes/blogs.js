@@ -71,7 +71,8 @@ router.post('/upload', admin, (req, res, next) => imageUpload.single('image')(re
   try {
     if (error) return res.status(error.code === 'LIMIT_FILE_SIZE' ? 413 : 400).json({ error: error.code === 'LIMIT_FILE_SIZE' ? 'Image must be 5 MB or smaller.' : 'Upload a JPEG, PNG, WebP, or GIF image.' });
     if (!req.file) return res.status(400).json({ error: 'Choose an image to upload.' });
-    if (!objectStorage || !storage.publicBaseUrl) return res.status(503).json({ error: 'Image storage is not configured.' });
+    const missingStorageSettings = ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_PUBLIC_BASE_URL'].filter(setting => ({ S3_BUCKET: storage.bucket, S3_ACCESS_KEY_ID: storage.accessKeyId, S3_SECRET_ACCESS_KEY: storage.secretAccessKey, S3_PUBLIC_BASE_URL: storage.publicBaseUrl }[setting] ? false : true));
+    if (!objectStorage || missingStorageSettings.length) return res.status(503).json({ error: `Image storage is not configured. Missing: ${missingStorageSettings.join(', ')}.` });
     const extension = req.file.originalname.includes('.') ? req.file.originalname.slice(req.file.originalname.lastIndexOf('.')).toLowerCase() : '';
     const key = `blog-covers/${Date.now()}-${crypto.randomUUID()}${extension}`;
     await objectStorage.send(new PutObjectCommand({ Bucket: storage.bucket, Key: key, Body: req.file.buffer, ContentType: req.file.mimetype, CacheControl: 'public, max-age=31536000, immutable' }));
