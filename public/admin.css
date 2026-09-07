@@ -293,9 +293,41 @@ dialog::backdrop {
     }
 }
 
-.category-manager { display: flex; align-items: end; gap: 8px; margin-top: 14px; }
-.category-input { flex: 1; margin: 0; }
-.category-manager .button { white-space: nowrap; }
-.category-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.category-chip { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font: .75rem Arial, sans-serif; }
-.category-delete { padding: 0 0 0 5px; border: 0; background: transparent; color: var(--danger); cursor: pointer; }
+.category-manager {
+    display: flex;
+    align-items: end;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.category-input {
+    flex: 1;
+    margin: 0;
+}
+
+.category-manager .button {
+    white-space: nowrap;
+}
+
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.category-chip {
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    font: .75rem Arial, sans-serif;
+}
+
+.category-delete {
+    padding: 0 0 0 5px;
+    border: 0;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+}
