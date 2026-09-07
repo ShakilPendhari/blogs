@@ -70,6 +70,11 @@
                             <option value="false">Drafts</option>
                         </select>
                     </div>
+                    <form id="category-form" class="category-manager">
+                        <label class="category-input">New category<input id="new-category" maxlength="60" placeholder="e.g. Testing"></label>
+                        <button class="button secondary" type="submit">Add category</button>
+                    </form>
+                    <div id="category-list" class="category-list" aria-live="polite"></div>
                     <div id="articles" class="articles"></div>
                     <div class="pagination"><button id="previous-page" class="button secondary"
                             type="button">Previous</button><span id="page-summary"></span><button id="next-page"

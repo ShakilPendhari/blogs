@@ -3,7 +3,8 @@ const crypto = require('node:crypto');
 const multer = require('multer');
 const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const Blog = require('../models/Blog');
-const { categories } = Blog;
+const Category = require('../models/Category');
+const { defaultCategories } = Category;
 const admin = require('../middleware/admin');
 const { storage } = require('../config');
 const router = express.Router();
@@ -55,16 +56,54 @@ function required(payload, creating) {
 
   }
 }
+async function ensureCategories() {
+  if (!await Category.exists({})) await Category.insertMany(defaultCategories.map(name => ({ name })), { ordered: false });
+}
+async function validateCategory(category) {
+  if (category && !await Category.exists({ name: category })) {
+    const error = new Error('Choose an existing category.');
+    error.status = 400;
+    throw error;
+  }
+}
 
 router.get('/categories', async (req, res, next) => {
   try {
-    res.json({ categories });
+    let categories = await Category.find({}).sort({ name: 1 }).select('name -_id').lean();
+    if (!categories.length) {
+      await Category.insertMany(defaultCategories.map(name => ({ name })), { ordered: false });
+      categories = defaultCategories.sort().map(name => ({ name }));
+    }
+    res.json({ categories: categories.map(category => category.name) });
 
   }
   catch (error) {
     next(error);
 
   }
+});
+
+router.post('/categories', admin, async (req, res, next) => {
+  try {
+    const name = cleanText(req.body?.name);
+    if (!name) return res.status(400).json({ error: 'Category name is required.' });
+    const category = await Category.create({ name });
+    res.status(201).json({ category: category.name });
+  } catch (error) {
+    if (error.code === 11000) return res.status(409).json({ error: 'That category already exists.' });
+    next(error);
+  }
+});
+
+router.delete('/categories/:name', admin, async (req, res, next) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    if (name === 'Other') return res.status(400).json({ error: 'The Other category cannot be deleted.' });
+    if (await Blog.exists({ category: name })) return res.status(409).json({ error: 'Move blogs out of this category before deleting it.' });
+    const category = await Category.findOneAndDelete({ name });
+    if (!category) return res.status(404).json({ error: 'Category not found.' });
+    res.status(204).end();
+  } catch (error) { next(error); }
 });
 
 router.post('/upload', admin, (req, res, next) => imageUpload.single('image')(req, res, async error => {
@@ -133,6 +172,8 @@ router.post('/', admin, async (req, res, next) => {
   try {
     const payload = normalizePayload(req.body);
     required(payload, true);
+    await ensureCategories();
+    await validateCategory(payload.category);
     const blog = await Blog.create(payload);
     res.status(201).json({ blog });
   } catch (error) {
@@ -144,6 +185,8 @@ router.post('/', admin, async (req, res, next) => {
 router.put('/:id', admin, async (req, res, next) => {
   try {
     const payload = normalizePayload(req.body);
+    await ensureCategories();
+    await validateCategory(payload.category);
     const current = await Blog.findById(req.params.id);
     if (!current) return res.status(404).json({ error: 'Blog not found.' });
     if (payload.published === true && !current.published && !payload.publishedAt) payload.publishedAt = new Date();

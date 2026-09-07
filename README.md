@@ -63,6 +63,8 @@ The portfolio frontend must use the API base URL ending in `/api`, for example `
 - `GET /api/health` returns API health.
 - `GET /api/blogs` returns paginated published blogs, newest first. Use `?page=1&limit=10&search=hooks&category=Frontend` to filter and paginate.
 - `GET /api/blogs/categories` returns available categories.
+- `POST /api/blogs/categories` creates a category and requires admin authentication with `{ "name": "Testing" }`.
+- `DELETE /api/blogs/categories/:name` deletes an unused category and requires admin authentication.
 - `GET /api/blogs/:slug` returns one published blog.
 - `POST /api/auth/login` accepts `{ "password": "..." }` and returns an admin JWT.
 - `POST /api/auth/logout` revokes a bearer token.
@@ -70,3 +72,5 @@ The portfolio frontend must use the API base URL ending in `/api`, for example `
 - `POST /api/blogs`, `PUT /api/blogs/:id`, and `DELETE /api/blogs/:id` require `Authorization: Bearer <token>`.
 
 Blog creation requires `title`, `excerpt`, and `content`. Optional fields are `slug`, `coverImage`, `githubUrl`, `deployedUrl`, `readingTime`, `category`, `tags`, `published`, and `publishedAt`. `content` is Markdown. Admin listing supports `page`, `limit`, `search`, `category`, and `published` filters.
+
+Categories can also be created and deleted from the admin panel. The initial built-in categories are inserted automatically the first time the category endpoint is used. A category cannot be deleted while a blog still uses it.
