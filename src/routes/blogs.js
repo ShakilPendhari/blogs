@@ -6,7 +6,7 @@ const Blog = require('../models/Blog');
 const Category = require('../models/Category');
 const { defaultCategories } = Category;
 const admin = require('../middleware/admin');
-const { storage } = require('../config');
+const { blogSiteUrl, storage } = require('../config');
 const router = express.Router();
 const imageUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, callback) => callback(null, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.mimetype)) });
 const objectStorage = storage.bucket && storage.accessKeyId && storage.secretAccessKey ? new S3Client({ endpoint: storage.endpoint, region: storage.region, credentials: { accessKeyId: storage.accessKeyId, secretAccessKey: storage.secretAccessKey }, forcePathStyle: Boolean(storage.endpoint) }) : null;
@@ -139,14 +139,23 @@ async function listBlogs(req, res, includeDrafts = false) {
   const filter = listFilter(req.query, includeDrafts);
   const { page, limit, skip } = pagination(req.query);
   const [blogs, total] = await Promise.all([Blog.find(filter).sort({ publishedAt: -1, createdAt: -1 }).skip(skip).limit(limit).select('-__v'), Blog.countDocuments(filter)]);
-  res.json({ blogs, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+  res.json({ blogs: blogs.map(addLinks), pagination: { page, limit, total, pages: Math.ceil(total / limit) }, links: { index: blogSiteUrl } });
 }
+function addLinks(blog) { const value = blog.toObject ? blog.toObject() : blog; return { ...value, links: { index: blogSiteUrl, article: `${blogSiteUrl}/${encodeURIComponent(value.slug)}` } }; }
 router.get('/admin/all', admin, async (req, res, next) => {
   try {
     await listBlogs(req, res, true);
   } catch (error) {
     next(error);
   }
+});
+
+router.get('/latest', async (req, res, next) => {
+  try {
+    const blog = await Blog.findOne({ published: true }).sort({ publishedAt: -1, createdAt: -1 }).select('-__v').lean();
+    if (!blog) return res.status(404).json({ error: 'No published blogs found.' });
+    res.json({ blog: addLinks(blog), links: { index: blogSiteUrl, article: `${blogSiteUrl}/${encodeURIComponent(blog.slug)}` } });
+  } catch (error) { next(error); }
 });
 
 router.get('/', async (req, res, next) => {
@@ -161,7 +170,7 @@ router.get('/:slug', async (req, res, next) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug.toLowerCase(), published: true }).select('-__v');
     if (!blog) return res.status(404).json({ error: 'Blog not found.' });
-    res.json({ blog });
+    res.json({ blog: addLinks(blog), links: { index: blogSiteUrl, article: `${blogSiteUrl}/${encodeURIComponent(blog.slug)}` } });
   } catch (error) {
     next(error);
 
