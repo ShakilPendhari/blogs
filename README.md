@@ -15,6 +15,8 @@ The local API is available at `http://localhost:5000/api`. Seed example articles
 
 The public article index is available at `http://localhost:5000/`. Individual articles use clean URLs such as `http://localhost:5000/my-article-slug`. The index keeps search, topic filters, and pagination in the URL so filtered views can be shared.
 
+SEO endpoints are available at `/robots.txt` and `/sitemap.xml`. After deployment, submit the full sitemap URL to Google Search Console or another search engine webmaster tool.
+
 ## Environment variables
 
 The server `.env` only needs these values:

@@ -5,6 +5,7 @@ const cors = require('cors');
 const { clientUrls, adminPasswordHash, adminJwtSecret } = require('./config');
 const { createSession, destroySession, verifyPassword } = require('./middleware/authSession');
 const blogRoutes = require('./routes/blogs');
+const Blog = require('./models/Blog');
 const errorHandler = require('./middleware/errorHandler');
 const app = express();
 app.use(express.static(path.join(__dirname, '../public')));
@@ -13,6 +14,14 @@ app.use(cors({ origin: (origin, callback) => callback(null, !origin || clientUrl
 app.use(express.json({ limit: '1mb' }));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../public/blogs.html')));
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/sitemap.xml', async (req, res, next) => {
+    try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const blogs = await Blog.find({ published: true }).select('slug updatedAt publishedAt').lean();
+        const urls = [`<url><loc>${baseUrl}/</loc></url>`, ...blogs.map(blog => `<url><loc>${baseUrl}/${encodeURIComponent(blog.slug)}</loc><lastmod>${new Date(blog.updatedAt || blog.publishedAt).toISOString()}</lastmod></url>`)].join('');
+        res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
+    } catch (error) { next(error); }
+});
 app.post('/api/auth/login', (req, res) => {
     if (!adminPasswordHash || !verifyPassword(req.body?.password, adminPasswordHash)) return res.status(401).json({ error: 'Invalid password.' });
     res.json({ token: createSession(adminJwtSecret), expiresIn: '8h' });
