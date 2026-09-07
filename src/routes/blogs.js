@@ -1,8 +1,14 @@
 const express = require('express');
+const crypto = require('node:crypto');
+const multer = require('multer');
+const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const Blog = require('../models/Blog');
 const { categories } = Blog;
 const admin = require('../middleware/admin');
+const { storage } = require('../config');
 const router = express.Router();
+const imageUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, callback) => callback(null, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.mimetype)) });
+const objectStorage = storage.bucket && storage.accessKeyId && storage.secretAccessKey ? new S3Client({ endpoint: storage.endpoint, region: storage.region, credentials: { accessKeyId: storage.accessKeyId, secretAccessKey: storage.secretAccessKey }, forcePathStyle: Boolean(storage.endpoint) }) : null;
 
 
 const cleanText = value => typeof value === 'string' ? value.trim() : value;
@@ -60,6 +66,18 @@ router.get('/categories', async (req, res, next) => {
 
   }
 });
+
+router.post('/upload', admin, (req, res, next) => imageUpload.single('image')(req, res, async error => {
+  try {
+    if (error) return res.status(error.code === 'LIMIT_FILE_SIZE' ? 413 : 400).json({ error: error.code === 'LIMIT_FILE_SIZE' ? 'Image must be 5 MB or smaller.' : 'Upload a JPEG, PNG, WebP, or GIF image.' });
+    if (!req.file) return res.status(400).json({ error: 'Choose an image to upload.' });
+    if (!objectStorage || !storage.publicBaseUrl) return res.status(503).json({ error: 'Image storage is not configured.' });
+    const extension = req.file.originalname.includes('.') ? req.file.originalname.slice(req.file.originalname.lastIndexOf('.')).toLowerCase() : '';
+    const key = `blog-covers/${Date.now()}-${crypto.randomUUID()}${extension}`;
+    await objectStorage.send(new PutObjectCommand({ Bucket: storage.bucket, Key: key, Body: req.file.buffer, ContentType: req.file.mimetype, CacheControl: 'public, max-age=31536000, immutable' }));
+    res.status(201).json({ url: `${storage.publicBaseUrl}/${key}` });
+  } catch (uploadError) { next(uploadError); }
+}));
 
 
 function pagination(query) {

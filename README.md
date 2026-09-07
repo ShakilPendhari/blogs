@@ -25,9 +25,17 @@ ADMIN_PASSWORD_HASH=<bcrypt-hash>
 ADMIN_JWT_SECRET=<long-random-secret>
 CLIENT_URL=http://localhost:3000
 PORT=5000
+S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+S3_REGION=auto
+S3_BUCKET=portfolio-blog-images
+S3_ACCESS_KEY_ID=<storage-access-key>
+S3_SECRET_ACCESS_KEY=<storage-secret>
+S3_PUBLIC_BASE_URL=https://images.example.com
 ```
 
 `MONGODB_URI`, `ADMIN_PASSWORD_HASH`, and `ADMIN_JWT_SECRET` are server-only. `PORT` is optional locally and should normally be omitted on Railway because Railway provides it. `CLIENT_URL` may contain multiple comma-separated frontend origins, without trailing slashes. Do not add frontend variables such as `REACT_APP_API_URL` to this backend.
+
+Image uploads use S3-compatible object storage. Cloudflare R2 is a good low-cost/free-allowance option: create a bucket, enable a public custom domain (or public bucket URL), create an API token with object read/write access, and set the `S3_*` variables above. AWS S3 also works; omit `S3_ENDPOINT`, use your AWS region, and set `S3_PUBLIC_BASE_URL` to the bucket's public HTTPS base URL. Never expose the access key or secret in frontend code.
 
 For the deployed portfolio, set this Railway variable exactly:
 

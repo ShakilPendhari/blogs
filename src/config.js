@@ -9,4 +9,4 @@ function validateEnvironment() {
   if (!process.env.ADMIN_JWT_SECRET) throw new Error('Missing ADMIN_JWT_SECRET.');
 }
 const clientUrls = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map(url => url.trim()).filter(Boolean);
-module.exports = { port: Number(process.env.PORT) || 5000, mongoUri: process.env.MONGODB_URI, clientUrl: clientUrls[0], clientUrls, adminPasswordHash: process.env.ADMIN_PASSWORD_HASH, adminJwtSecret: process.env.ADMIN_JWT_SECRET, validateEnvironment };
+module.exports = { port: Number(process.env.PORT) || 5000, mongoUri: process.env.MONGODB_URI, clientUrl: clientUrls[0], clientUrls, adminPasswordHash: process.env.ADMIN_PASSWORD_HASH, adminJwtSecret: process.env.ADMIN_JWT_SECRET, storage: { endpoint: process.env.S3_ENDPOINT, region: process.env.S3_REGION || 'auto', bucket: process.env.S3_BUCKET, accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY, publicBaseUrl: process.env.S3_PUBLIC_BASE_URL?.replace(/\/$/, '') }, validateEnvironment };
